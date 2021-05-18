@@ -36,12 +36,21 @@ class Actor(nn.Module):
         layer.weight.data.uniform_(-init_w, init_w) # 자기 자신 바꿀땐 _ 잊지 말자
         layer.bias.data.uniform_(-init_w, init_w)
 
+# Critic is one layer network that have relu activate function
 class Critic(nn.Module):
-    NotImplemented
+    def __init__(self, in_dims, hidden_dims,):
+        super(Critic, self).__init__()
+        self.hidden1 = nn.Linear(in_dims, hidden_dims)
+        self.outputs = nn.Linear(hidden_dims, 1)
+        self.initialize_uniformly(self.outputs)
 
+    def forward(self, state):
+        x = F.relu(self.hidden1(state))
+        return self.out(x)
 
-
-
+    def initialize_uniformly(self, layer:nn.Linear, init_w: float = 3e-3) :
+        layer.weight.data.uniform_(-init_w, init_w) # 자기 자신 바꿀땐 _ 잊지 말자
+        layer.bias.data.uniform_(-init_w, init_w)
 
 
 
