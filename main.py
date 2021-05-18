@@ -1,16 +1,47 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.distributions import Normal
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+# Actor is network that have 1 hidden layer
+# 1st layer -> relu->
+#                  ->
+class Actor(nn.Module):
+    def __init__(self, in_dims, out_dims, hidden_dimension = 128):
+        """
+        :param in_dims: Model input's dimension
+        :param out_dims: Model output's dimension
+        """
+        super(Actor, self).__init__()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+        self.hidden1= nn.Linear(in_dims, hidden_dimension)
+        self.mu_layer = nn.Linear(hidden_dimension, out_dims)
+        self.log_std_layer = nn.Linear(hidden_dimension, out_dims)
+
+        self.initialize_uniformly(self.mu_layer)
+        self.initialize_uniformly(self.log_std_layer)
+
+    def forward(self, state:torch.Tensor):
+        x = F.relu(self.hidden1(state))
+        mu = torch.tanh(self.mu_layer(x))*2
+        log_std = F.softplus(self.log_std_layer(x))
+        std = torch.exp(log_std)
+
+        dist = Normal(mu, std)
+        action = dist.sample()
+        return action, dist
+
+    def initialize_uniformly(self, layer:nn.Linear, init_w: float = 3e-3) :
+        layer.weight.data.uniform_(-init_w, init_w) # 자기 자신 바꿀땐 _ 잊지 말자
+        layer.bias.data.uniform_(-init_w, init_w)
+
+class Critic(nn.Module):
+    NotImplemented
+
+
+
+
+
+
+
