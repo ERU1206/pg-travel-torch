@@ -8,7 +8,7 @@ from torch.distributions import Normal
 # 1st layer -> relu->
 #                  ->
 class Actor(nn.Module):
-    def __init__(self, in_dims, out_dims, hidden_dimension = 128):
+    def __init__(self, in_dims:int, out_dims:int, hidden_dimension:int = 128):
         """
         :param in_dims: Model input's dimension
         :param out_dims: Model output's dimension
@@ -46,7 +46,7 @@ class Critic(nn.Module):
 
     def forward(self, state):
         x = F.relu(self.hidden1(state))
-        return self.out(x)
+        return self.outputs(x)
 
     def initialize_uniformly(self, layer:nn.Linear, init_w: float = 3e-3) :
         layer.weight.data.uniform_(-init_w, init_w) # 자기 자신 바꿀땐 _ 잊지 말자
